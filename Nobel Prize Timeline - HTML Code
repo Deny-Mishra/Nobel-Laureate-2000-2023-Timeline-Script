@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nobel Laureates in Economics Timeline (2000-2024)</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@11/dist/framer-motion.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useMemo } = React;
+        const { motion, AnimatePresence } = Motion;
+        
+        const categories = [
+          { id: 'A', label: 'Economic Theory & Methodology', color: 'bg-emerald-500', borderColor: 'border-emerald-500', textColor: 'text-emerald-700', bgLight: 'bg-emerald-50', percentage: '38%' },
+          { id: 'B', label: 'Empirical & Applied Economics', color: 'bg-amber-500', borderColor: 'border-amber-500', textColor: 'text-amber-700', bgLight: 'bg-amber-50', percentage: '38%' },
+          { id: 'C', label: 'Macro & Financial Economics', color: 'bg-sky-500', borderColor: 'border-sky-500', textColor: 'text-sky-700', bgLight: 'bg-sky-50', percentage: '24%' }
+        ];
+        
+        function ChevronDown({ className }) { return <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>; }
+        function Award({ className }) { return <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>; }
+        function TrendingUp({ className }) { return <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>; }
+        function GraduationCap({ className }) { return <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z M12 14v6.5" /></svg>; }
+        function BookOpen({ className }) { return <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>; }
+        
+        const nobelData = [
+          { year: 2024, category: 'B', laureates: 'Acemoglu, Johnson, Robinson', focus_area: 'Institutional Economics & Prosperity', universities: ['MIT', 'MIT', 'University of Chicago'], key_publications: ['Why Nations Fail: The Origins of Power, Prosperity, and Poverty (2012)', 'The Colonial Origins of Comparative Development (AER, 2001)', 'The Rise of Europe: Atlantic Trade and Economic Growth (AER, 2005)'], major_contributions: ['Demonstrated institutions as fundamental cause of economic prosperity', 'Extractive vs. inclusive institutions framework', 'Historical analysis of colonial institutions\' persistent effects'] },
+          { year: 2023, category: 'B', laureates: 'Claudia Goldin', focus_area: "Women's Labor Market Outcomes", universities: ['Harvard University'], key_publications: ['Understanding the Gender Gap: An Economic History of American Women (1990)', 'The Power of the Pill: Oral Contraceptives and Women\'s Career Decisions (JPE, 2002)', 'A Grand Gender Convergence: Its Last Chapter (AER, 2014)', 'Career & Family: Women\'s Century-Long Journey toward Equity (2021)'], major_contributions: ['U-shaped female labor force participation pattern', 'Marriage bar documentation (employers firing women upon marriage)', 'Contraceptive pill\'s effect on women\'s career investment', 'Greedy work explanation for gender pay gap'] },
+          { year: 2022, category: 'C', laureates: 'Bernanke, Diamond, Dybvig', focus_area: 'Banks and Financial Crises', universities: ['Brookings Institution', 'University of Chicago', 'Washington University in St. Louis'], key_publications: ['Bank Runs, Deposit Insurance, and Liquidity (JPE, 1983) - Diamond & Dybvig', 'Nonmonetary Effects of the Financial Crisis in the Propagation of the Great Depression (AER, 1983) - Bernanke', 'Financial Intermediation and Delegated Monitoring (Review of Economic Studies, 1984) - Diamond'], major_contributions: ['Diamond-Dybvig model: first formal model of bank runs', 'Multiple equilibria and self-fulfilling bank panics', 'Bernanke\'s credit channel of monetary transmission', 'Theoretical foundation for deposit insurance'] },
+          { year: 2021, category: 'B', laureates: 'Card, Angrist, Imbens', focus_area: 'Causal Inference & Labor Markets', universities: ['UC Berkeley', 'MIT', 'Stanford University'], key_publications: ['Identification and Estimation of Local Average Treatment Effects (Econometrica, 1994) - Angrist & Imbens', 'Myth and Measurement: The New Economics of the Minimum Wage (1995) - Card & Krueger', 'The Impact of the Mariel Boatlift on the Miami Labor Market (ILR Review, 1990) - Card'], major_contributions: ['Local Average Treatment Effect (LATE) framework', 'Natural experiments in labor economics', 'NJ-PA minimum wage study showing employment increases', 'Mariel Boatlift study: immigration\'s minimal wage effects'] },
+          { year: 2020, category: 'A', laureates: 'Milgrom, Wilson', focus_area: 'Auction Theory & Market Design', universities: ['Stanford University', 'Stanford University'], key_publications: ['A Theory of Auctions and Competitive Bidding (Econometrica, 1982) - Milgrom & Weber', 'Putting Auction Theory to Work (2004) - Milgrom', 'Competitive Bidding with Asymmetric Information (Management Science, 1967) - Wilson'], major_contributions: ['FCC spectrum auction design earning $617B globally', 'Winner\'s curse identification in common-value auctions', 'Revenue equivalence theorem', 'Simultaneous multiple-round auction (SMRA) format'] },
+          { year: 2019, category: 'B', laureates: 'Banerjee, Duflo, Kremer', focus_area: 'Experimental Development Economics', universities: ['MIT', 'MIT', 'University of Chicago'], key_publications: ['Poor Economics: A Radical Rethinking of the Way to Fight Global Poverty (2011) - Banerjee & Duflo', 'The O-Ring Theory of Economic Development (QJE, 1993) - Kremer', 'Worms: Identifying Impacts on Education and Health (Econometrica, 2004) - Kremer et al.'], major_contributions: ['Randomized controlled trials (RCTs) in development economics', '$0.50 deworming treatment increases lifetime earnings by $3,500', 'Teaching at the right level more effective than curriculum changes', 'Microcredit limitations: helps existing businesses, rarely creates new ones'] },
+          { year: 2018, category: 'C', laureates: 'Nordhaus, Romer', focus_area: 'Climate & Endogenous Growth', universities: ['Yale University', 'New York University'], key_publications: ['An Economic Theory of Climate Change (AER, 1994) - Nordhaus', 'Endogenous Technological Change (JPE, 1990) - Romer', 'The Climate Casino: Risk, Uncertainty, and Economics for a Warming World (2013) - Nordhaus', 'Increasing Returns and Long-Run Growth (JPE, 1986) - Romer'], major_contributions: ['DICE/RICE integrated assessment models linking climate and economy', 'Social cost of carbon calculation ($31/ton in 2010 dollars)', 'Endogenous growth theory: technological change within economic system', 'Non-rival goods theory: ideas don\'t deplete when used'] },
+          { year: 2017, category: 'B', laureates: 'Richard H. Thaler', focus_area: 'Behavioral Economics (Nudges)', universities: ['University of Chicago'], key_publications: ['Nudge: Improving Decisions About Health, Wealth, and Happiness (2008) - Thaler & Sunstein', 'Toward a Positive Theory of Consumer Choice (JEBO, 1980)', 'Mental Accounting and Consumer Choice (Marketing Science, 1985)', 'Misbehaving: The Making of Behavioral Economics (2015)'], major_contributions: ['Mental accounting: people treat money differently based on source/use', 'Endowment effect: valuing owned items more highly', 'Nudge theory: small design changes significantly alter behavior', 'Present bias and hyperbolic discounting explaining undersaving'] },
+          { year: 2016, category: 'A', laureates: 'Hart, Holmström', focus_area: 'Contract Theory', universities: ['Harvard University', 'MIT'], key_publications: ['Moral Hazard and Observability (Bell Journal of Economics, 1979) - Holmström', 'The Costs and Benefits of Ownership: A Theory of Integration (JPE, 1986) - Hart', 'Property Rights and the Nature of the Firm (JPE, 1990) - Hart & Moore', 'Multitask Principal-Agent Analyses (JLEO, 1991) - Holmström & Milgrom'], major_contributions: ['Informativeness principle: contracts should use all performance indicators', 'Incomplete contracts theory: most contracts can\'t specify all contingencies', 'Property rights theory: asset ownership determines bargaining power', 'Moral hazard in teams: free-rider problems in team production'] },
+          { year: 2015, category: 'B', laureates: 'Angus Deaton', focus_area: 'Consumption, Poverty, and Welfare', universities: ['Princeton University'], key_publications: ['Economics and Consumer Behavior (1980) - Deaton & Muellbauer', 'The Great Escape: Health, Wealth, and the Origins of Inequality (2013)', 'Understanding Consumption (1992, Clarendon Lectures)', 'Health, Inequality, and Economic Development (JEL, 2003)'], major_contributions: ['Almost Ideal Demand System (AIDS) for consumer demand estimation', 'Deaton paradox: consumption reacts too smoothly to income shocks', 'Pseudo-panel methods for repeated cross-sections', 'Indian poverty decline documentation post-1991 reforms'] },
+          { year: 2014, category: 'A', laureates: 'Jean Tirole', focus_area: 'Market Power and Regulation', universities: ['Toulouse School of Economics'], key_publications: ['The Theory of Industrial Organization (1988)', 'A Theory of Incentives in Procurement and Regulation (1993) - Laffont & Tirole', 'Platform Competition in Two-Sided Markets (JEEA, 2003) - Rochet & Tirole', 'The Theory of Corporate Finance (2006)'], major_contributions: ['Two-sided markets theory: platforms with network effects', 'Regulation under asymmetric information', 'Dynamic pricing and intertemporal price discrimination', 'Market power in digital economy and antitrust policy'] },
+          { year: 2013, category: 'C', laureates: 'Fama, Hansen, Shiller', focus_area: 'Asset Pricing (Empirical Analysis)', universities: ['University of Chicago', 'University of Chicago', 'Yale University'], key_publications: ['Efficient Capital Markets: A Review of Theory and Empirical Work (Journal of Finance, 1970) - Fama', 'Do Stock Prices Move Too Much? (AER, 1981) - Shiller', 'Large Sample Properties of GMM Estimators (Econometrica, 1982) - Hansen', 'Irrational Exuberance (2000) - Shiller'], major_contributions: ['Efficient Market Hypothesis (EMH): prices reflect all available information', 'Excess volatility puzzle: stock prices move more than dividends justify', 'Generalized Method of Moments (GMM) unified econometric framework', 'Three-factor model: market, size, and value factors explain returns'] },
+          { year: 2012, category: 'A', laureates: 'Roth, Shapley', focus_area: 'Market Design & Matching Theory', universities: ['Stanford University', 'UCLA'], key_publications: ['College Admissions and the Stability of Marriage (American Mathematical Monthly, 1962) - Gale & Shapley', 'The Evolution of the Labor Market for Medical Interns (JPE, 1984) - Roth', 'Kidney Exchange (QJE, 2004) - Roth et al.', 'A Value for n-person Games (1953) - Shapley'], major_contributions: ['Gale-Shapley algorithm for stable matching (deferred acceptance)', 'National Resident Matching Program redesign', 'Kidney exchange chains increasing transplants by 30%', 'Shapley value: fair division of cooperative surplus'] },
+          { year: 2011, category: 'C', laureates: 'Sargent, Sims', focus_area: 'Empirical Macroeconomics', universities: ['New York University', 'Princeton University'], key_publications: ['Rational Expectations and the Optimal Monetary Instrument (JPE, 1975) - Sargent & Wallace', 'Macroeconomics and Reality (Econometrica, 1980) - Sims', 'Rational Expectations and Inflation (1993) - Sargent', 'Money, Income, and Causality (AER, 1972) - Sims'], major_contributions: ['Rational expectations revolution in macroeconomics', 'Vector autoregression (VAR) framework for time series', 'Policy ineffectiveness proposition: anticipated monetary policy has no real effects', 'Granger causality tests for predictive relationships'] },
+          { year: 2010, category: 'B', laureates: 'Diamond, Mortensen, Pissarides', focus_area: 'Labor Market Search Frictions', universities: ['MIT', 'Northwestern University', 'London School of Economics'], key_publications: ['A Model of Price Adjustment (Journal of Economic Theory, 1971) - Diamond', 'Job Creation and Job Destruction in Unemployment Theory (Review of Economic Studies, 1994) - Mortensen & Pissarides', 'Equilibrium Unemployment Theory (1990) - Pissarides', 'Wage Dispersion: Why Are Similar Workers Paid Differently? (2003) - Mortensen'], major_contributions: ['Diamond-Mortensen-Pissarides (DMP) model: standard framework for unemployment', 'Search frictions explaining simultaneous job creation and destruction', 'Beveridge curve: negative relationship between vacancies and unemployment', 'Nash bargaining in wage determination'] },
+          { year: 2009, category: 'B', laureates: 'Elinor Ostrom, Williamson', focus_area: 'Economic Governance (The Commons)', universities: ['Indiana University', 'UC Berkeley'], key_publications: ['Governing the Commons: Evolution of Institutions for Collective Action (1990) - Ostrom', 'Markets and Hierarchies: Analysis and Antitrust Implications (1975) - Williamson', 'Understanding Institutional Diversity (2005) - Ostrom', 'The Economics of Organization: The Transaction Cost Approach (American Journal of Sociology, 1981) - Williamson'], major_contributions: ['Common-pool resource management without privatization or state control', 'Eight design principles for sustainable resource management', 'Transaction cost economics: firms minimize costs of market transactions', 'Asset specificity creates hold-up problems'] },
+          { year: 2008, category: 'C', laureates: 'Paul Krugman', focus_area: 'New Trade Theory & Economic Geography', universities: ['Princeton University'], key_publications: ['Increasing Returns, Monopolistic Competition, and International Trade (JIE, 1979)', 'Scale Economies, Product Differentiation, and the Pattern of Trade (AER, 1980)', 'Geography and Trade (1991)', 'A Model of Balance-of-Payments Crises (JMCB, 1979)'], major_contributions: ['New trade theory: intra-industry trade through increasing returns', 'Home market effect: countries export goods with large domestic demand', 'Core-periphery model: small advantages lead to spatial concentration', 'Liquidity trap analysis at zero lower bound'] },
+          { year: 2007, category: 'A', laureates: 'Hurwicz, Maskin, Myerson', focus_area: 'Mechanism Design Theory', universities: ['University of Minnesota', 'Harvard University', 'University of Chicago'], key_publications: ['On Informationally Decentralized Systems (1972) - Hurwicz', 'Optimal Auction Design (Mathematics of Operations Research, 1981) - Myerson', 'Nash Equilibrium and Welfare Optimality (Review of Economic Studies, 1999) - Maskin', 'The Design of Mechanisms for Resource Allocation (AER, 1973) - Hurwicz'], major_contributions: ['Mechanism design framework: "reverse game theory"', 'Incentive compatibility: truth-telling as optimal strategy', 'Revenue equivalence theorem in auctions', 'Nash implementation theorem and monotonicity condition'] },
+          { year: 2006, category: 'A', laureates: 'Edmund Phelps', focus_area: 'Intertemporal Macroeconomic Trade-offs', universities: ['Columbia University'], key_publications: ['Golden Rules of Economic Growth (1966)', 'Money-Wage Dynamics and Labor Market Equilibrium (JPE, 1968)', 'Structural Slumps: The Modern Equilibrium Theory of Unemployment (1994)', 'Microeconomic Foundations of Employment and Inflation Theory (1970)'], major_contributions: ['Natural rate of unemployment: equilibrium rate determined by real factors', 'Expectations-augmented Phillips curve', 'Golden rule of capital accumulation: optimal savings rate', 'Structuralist theory of European unemployment persistence'] },
+          { year: 2005, category: 'A', laureates: 'Aumann, Schelling', focus_area: 'Game Theory (Conflict/Cooperation)', universities: ['Hebrew University of Jerusalem', 'University of Maryland'], key_publications: ['The Strategy of Conflict (1960) - Schelling', 'Agreeing to Disagree (Annals of Statistics, 1976) - Aumann', 'Micromotives and Macrobehavior (1978) - Schelling', 'Correlated Equilibrium as Expression of Bayesian Rationality (Econometrica, 1987) - Aumann'], major_contributions: ['Correlated equilibrium: players receive correlated signals', 'Focal points: natural coordination points in games', 'Agreeing to Disagree theorem: rational agents with common priors can\'t disagree', 'Credible commitments and brinkmanship strategies'] },
+          { year: 2004, category: 'C', laureates: 'Kydland, Prescott', focus_area: 'Dynamic Macroeconomics', universities: ['UC Santa Barbara', 'Arizona State University'], key_publications: ['Rules Rather than Discretion: The Inconsistency of Optimal Plans (JPE, 1977)', 'Time to Build and Aggregate Fluctuations (Econometrica, 1982)', 'Theory Ahead of Business Cycle Measurement (Federal Reserve Minneapolis, 1986) - Prescott', 'Why Do Americans Work So Much More Than Europeans? (2004) - Prescott'], major_contributions: ['Time inconsistency: optimal plans not followed when they can be revised', 'Real business cycle theory: cycles driven by technology shocks not monetary factors', 'Calibration methodology for macroeconomic models', 'High intertemporal labor supply elasticity'] },
+          { year: 2003, category: 'C', laureates: 'Engle, Granger', focus_area: 'Time-Series Econometrics', universities: ['New York University', 'UC San Diego'], key_publications: ['Autoregressive Conditional Heteroscedasticity (Econometrica, 1982) - Engle', 'Co-Integration and Error Correction (Econometrica, 1987) - Engle & Granger', 'Investigating Causal Relations by Econometric Models (Econometrica, 1969) - Granger', 'Dynamic Conditional Correlation (Journal of Business & Economic Statistics, 2002) - Engle'], major_contributions: ['ARCH model: autoregressive conditional heteroskedasticity (volatility clustering)', 'GARCH extension for generalized ARCH', 'Cointegration: long-run equilibrium between non-stationary series', 'Granger causality: statistical test for predictive relationships'] },
+          { year: 2002, category: 'B', laureates: 'Kahneman, Smith', focus_area: 'Behavioral & Experimental Economics', universities: ['Princeton University', 'Chapman University'], key_publications: ['Prospect Theory: An Analysis of Decision under Risk (Econometrica, 1979) - Kahneman & Tversky', 'An Experimental Study of Competitive Market Behavior (JPE, 1962) - Smith', 'Thinking, Fast and Slow (2011) - Kahneman', 'Bargaining and Market Behavior (2000) - Smith'], major_contributions: ['Prospect theory: S-shaped value function, loss aversion, probability weighting', 'Heuristics and biases: availability, representativeness, anchoring', 'Experimental markets converge to competitive equilibrium', 'Peak-end rule: experiences judged by peak and end moments'] },
+          { year: 2001, category: 'A', laureates: 'Akerlof, Spence, Stiglitz', focus_area: 'Asymmetric Information', universities: ['UC Berkeley', 'Stanford University', 'Columbia University'], key_publications: ['The Market for Lemons: Quality Uncertainty and the Market Mechanism (QJE, 1970) - Akerlof', 'Job Market Signaling (QJE, 1973) - Spence', 'Equilibrium in Competitive Insurance Markets (QJE, 1976) - Rothschild & Stiglitz', 'Credit Rationing in Markets with Imperfect Information (AER, 1981) - Stiglitz & Weiss'], major_contributions: ['Market for lemons: asymmetric information can cause market collapse', 'Signaling theory: education signals ability rather than increasing productivity', 'Screening theory: uninformed parties elicit information from informed', 'Credit rationing: banks limit loans even with willing borrowers at higher rates'] },
+          { year: 2000, category: 'B', laureates: 'Heckman, McFadden', focus_area: 'Microeconometric Methods', universities: ['University of Chicago', 'UC Berkeley'], key_publications: ['Sample Selection Bias as a Specification Error (Econometrica, 1979) - Heckman', 'Conditional Logit Analysis of Qualitative Choice Behavior (1973) - McFadden', 'The Common Structure of Statistical Models (Annals of Economic and Social Measurement, 1976) - Heckman', 'Econometric Models of Probabilistic Choice (1981) - McFadden'], major_contributions: ['Heckman correction: two-step estimator for sample selection bias', 'Conditional logit model for discrete choice analysis', 'Returns to education: separated selection effects from treatment effects', 'Random utility maximization framework for choice models'] }
+        ];
+
+        function TimelineCard({ data, index, isLeft }) {
+          const [isExpanded, setIsExpanded] = useState(false);
+          const category = categories.find(c => c.id === data.category);
+          
+          return (
+            <motion.div initial={{ opacity: 0, x: isLeft ? -50 : 50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-50px" }} transition={{ duration: 0.5, delay: index * 0.05 }} className={`relative flex items-center ${isLeft ? 'md:flex-row-reverse' : ''} mb-8 md:mb-0`}>
+              <motion.div initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: index * 0.05 }} className={`hidden md:block absolute top-1/2 w-8 h-1 bg-gradient-to-r ${isLeft ? 'right-1/2 mr-4 origin-right' : 'left-1/2 ml-4 origin-left'} ${category.color.replace('bg-', 'from-')} to-transparent opacity-60`} style={{ transformOrigin: isLeft ? 'right' : 'left' }} />
+              <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 z-10">
+                <motion.div initial={{ scale: 0, rotate: -180 }} whileInView={{ scale: 1, rotate: 0 }} viewport={{ once: true }} transition={{ type: "spring", stiffness: 200, delay: index * 0.05 }} whileHover={{ scale: 1.15, rotate: 5 }} whileTap={{ scale: 0.95 }} className={`w-16 h-16 rounded-full bg-gradient-to-br ${category.color.replace('bg-', 'from-')} ${category.color.replace('bg-', 'to-')}/80 flex items-center justify-center shadow-xl cursor-pointer ring-4 ring-white`} onClick={() => setIsExpanded(!isExpanded)}>
+                  <span className="text-white font-bold text-lg drop-shadow-md">{data.year}</span>
+                </motion.div>
+              </div>
+              <div className={`w-full md:w-[calc(50%-4rem)] ${isLeft ? 'md:mr-auto md:pr-8' : 'md:ml-auto md:pl-8'}`}>
+                <motion.div layout onClick={() => setIsExpanded(!isExpanded)} whileHover={{ scale: 1.02, y: -4 }} transition={{ type: "spring", stiffness: 300, damping: 20 }} className={`relative bg-gradient-to-br from-white to-slate-50/50 rounded-3xl shadow-lg hover:shadow-2xl cursor-pointer border border-slate-200/50 overflow-hidden backdrop-blur-sm ${isExpanded ? 'ring-2 ring-offset-2 ' + category.borderColor.replace('border-', 'ring-') : ''}`} style={{ transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)' }}>
+                  <div className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${category.color.replace('bg-', 'from-')} ${category.color.replace('bg-', 'to-')}/80 opacity-80`} />
+                  <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)', backgroundSize: '24px 24px' }} />
+                  <div className="p-6 pt-7 relative">
+                    <div className="md:hidden flex items-center gap-3 mb-4">
+                      <div className={`w-11 h-11 rounded-full bg-gradient-to-br ${category.color.replace('bg-', 'from-')} ${category.color.replace('bg-', 'to-')}/80 flex items-center justify-center shadow-md ring-2 ring-white`}>
+                        <span className="text-white font-bold text-sm drop-shadow">{data.year}</span>
+                      </div>
+                      <span className={`text-xs font-semibold px-3 py-1.5 rounded-full ${category.bgLight} ${category.textColor} border ${category.borderColor} shadow-sm`}>{category.label}</span>
+                    </div>
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-3">
+                          <motion.div whileHover={{ rotate: 360 }} transition={{ duration: 0.6 }}>
+                            <Award className={`w-5 h-5 ${category.textColor} drop-shadow-sm`} />
+                          </motion.div>
+                          <span className={`hidden md:inline text-xs font-semibold px-3 py-1 rounded-full ${category.bgLight} ${category.textColor} border ${category.borderColor} shadow-sm`}>
+                            {category.id === 'A' ? 'Theory' : category.id === 'B' ? 'Empirical' : 'Macro/Finance'}
+                          </span>
+                        </div>
+                        <h3 className="font-bold text-slate-900 text-xl leading-tight mb-2 bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">{data.laureates}</h3>
+                        <p className="text-slate-600 text-sm font-medium leading-relaxed">{data.focus_area}</p>
+                      </div>
+                      <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} transition={{ type: "spring", stiffness: 200 }} className="flex-shrink-0 mt-1">
+                        <div className={`p-2 rounded-full ${isExpanded ? category.bgLight : 'bg-slate-100'} transition-colors duration-300`}>
+                          <ChevronDown className={`w-5 h-5 ${isExpanded ? category.textColor : 'text-slate-400'}`} />
+                        </div>
+                      </motion.div>
+                    </div>
+                    <AnimatePresence>
+                      {isExpanded && (
+                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.3 }} className="overflow-hidden">
+                          <div className="mt-4 pt-4 border-t border-slate-100 space-y-4">
+                            {data.universities && data.universities.length > 0 && (
+                              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+                                <div className="flex items-center gap-2 mb-3">
+                                  <div className={`p-1.5 rounded-lg ${category.bgLight}`}><GraduationCap className={`w-4 h-4 ${category.textColor}`} /></div>
+                                  <h4 className="font-bold text-slate-800 text-sm">Affiliated Universities</h4>
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                  {data.universities.map((uni, idx) => (
+                                    <motion.span key={idx} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 + idx * 0.05 }} whileHover={{ scale: 1.05 }} className={`text-xs px-3 py-1.5 rounded-full ${category.bgLight} ${category.textColor} border ${category.borderColor} font-medium shadow-sm hover:shadow-md transition-shadow`}>{uni}</motion.span>
+                                  ))}
+                                </div>
+                              </motion.div>
+                            )}
+                            {data.major_contributions && data.major_contributions.length > 0 && (
+                              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+                                <div className="flex items-center gap-2 mb-3">
+                                  <div className="p-1.5 rounded-lg bg-emerald-50"><TrendingUp className="w-4 h-4 text-emerald-600" /></div>
+                                  <h4 className="font-bold text-slate-800 text-sm">Major Contributions</h4>
+                                </div>
+                                <ul className="space-y-2">
+                                  {data.major_contributions.map((contribution, idx) => (
+                                    <motion.li key={idx} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 + idx * 0.05 }} className="text-slate-700 text-sm leading-relaxed flex items-start gap-3 group">
+                                      <span className="text-emerald-500 font-bold mt-0.5 group-hover:scale-125 transition-transform">•</span>
+                                      <span className="flex-1">{contribution}</span>
+                                    </motion.li>
+                                  ))}
+                                </ul>
+                              </motion.div>
+                            )}
+                            {data.key_publications && data.key_publications.length > 0 && (
+                              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+                                <div className="flex items-center gap-2 mb-3">
+                                  <div className="p-1.5 rounded-lg bg-blue-50"><BookOpen className="w-4 h-4 text-blue-600" /></div>
+                                  <h4 className="font-bold text-slate-800 text-sm">Key Publications</h4>
+                                </div>
+                                <ul className="space-y-2.5">
+                                  {data.key_publications.map((pub, idx) => (
+                                    <motion.li key={idx} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 + idx * 0.05 }} whileHover={{ x: 4 }} className="text-slate-700 text-xs leading-relaxed pl-4 border-l-2 border-blue-200 hover:border-blue-400 transition-colors group">
+                                      <span className="group-hover:text-blue-700 transition-colors">{pub}</span>
+                                    </motion.li>
+                                  ))}
+                                </ul>
+                              </motion.div>
+                            )}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </motion.div>
+              </div>
+            </motion.div>
+          );
+        }
+
+        function CategoryLegend({ activeFilter, onFilterChange }) {
+          return (
+            <div className="flex flex-wrap justify-center gap-3 mb-8">
+              <motion.button whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.95 }} onClick={() => onFilterChange('all')} className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${activeFilter === 'all' ? 'bg-gradient-to-r from-slate-800 to-slate-900 text-white shadow-xl shadow-slate-400/50' : 'bg-white text-slate-600 border-2 border-slate-200 hover:border-slate-400 shadow-md hover:shadow-lg'}`}>All Categories</motion.button>
+              {categories.map((cat) => (
+                <motion.button key={cat.id} whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.95 }} onClick={() => onFilterChange(cat.id)} className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 flex items-center gap-2 ${activeFilter === cat.id ? `bg-gradient-to-r ${cat.color.replace('bg-', 'from-')} ${cat.color.replace('bg-', 'to-')}/80 text-white border-2 ${cat.borderColor} shadow-xl ${cat.color.replace('bg-', 'shadow-')}/50` : 'bg-white text-slate-600 border-2 border-slate-200 hover:border-slate-400 shadow-md hover:shadow-lg'}`}>
+                  <motion.span whileHover={{ scale: 1.3, rotate: 360 }} transition={{ duration: 0.4 }} className={`w-3 h-3 rounded-full ${activeFilter === cat.id ? 'bg-white shadow-md' : cat.color}`} />
+                  <span className="hidden sm:inline">{cat.label}</span>
+                  <span className="sm:hidden">{cat.id === 'A' ? 'Theory' : cat.id === 'B' ? 'Empirical' : 'Macro'}</span>
+                  <span className={`text-xs ${activeFilter === cat.id ? 'opacity-90' : 'opacity-60'} font-bold`}>({cat.percentage})</span>
+                </motion.button>
+              ))}
+            </div>
+          );
+        }
+
+        function TimelineHeader() {
+          return (
+            <div className="text-center mb-12 md:mb-16">
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 text-slate-600 text-sm font-medium mb-6">
+                  <Award className="w-4 h-4" />
+                  <span>Sveriges Riksbank Prize in Economic Sciences</span>
+                </div>
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-800 mb-4 tracking-tight">
+                  Nobel Laureates in
+                  <span className="block bg-gradient-to-r from-emerald-600 via-amber-500 to-sky-500 bg-clip-text text-transparent">Economics</span>
+                </h1>
+                <p className="text-slate-500 text-lg md:text-xl max-w-2xl mx-auto mb-8">A visual journey through two decades of groundbreaking economic thought</p>
+                <div className="flex flex-wrap justify-center gap-6 md:gap-12 text-center">
+                  {[
+                    { icon: TrendingUp, value: '24', label: 'Years', color: 'from-emerald-400 to-emerald-600', shadow: 'shadow-emerald-200' },
+                    { icon: Award, value: '50+', label: 'Laureates', color: 'from-amber-400 to-amber-600', shadow: 'shadow-amber-200' },
+                    { icon: GraduationCap, value: '11', label: 'Top Universities', color: 'from-sky-400 to-sky-600', shadow: 'shadow-sky-200' }
+                  ].map((stat, i) => (
+                    <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 + i * 0.1 }} className="flex flex-col items-center">
+                      <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center mb-2 shadow-lg ${stat.shadow}`}>
+                        <stat.icon className="w-6 h-6 text-white" />
+                      </div>
+                      <span className="text-2xl font-bold text-slate-800">{stat.value}</span>
+                      <span className="text-sm text-slate-500">{stat.label}</span>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            </div>
+          );
+        }
+
+        function Timeline() {
+          const [activeFilter, setActiveFilter] = useState('all');
+          const filteredData = useMemo(() => activeFilter === 'all' ? nobelData : nobelData.filter(item => item.category === activeFilter), [activeFilter]);
+
+          return (
+            <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50">
+              <div className="max-w-6xl mx-auto px-4 py-12 md:py-20">
+                <TimelineHeader />
+                <CategoryLegend activeFilter={activeFilter} onFilterChange={setActiveFilter} />
+                <div className="relative">
+                  <motion.div initial={{ scaleY: 0 }} whileInView={{ scaleY: 1 }} viewport={{ once: true }} transition={{ duration: 1.2, ease: "easeOut" }} className="hidden md:block absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-emerald-300 via-amber-300 to-sky-300 -translate-x-1/2 origin-top rounded-full shadow-lg" style={{ transformOrigin: 'top' }} />
+                  <div className="md:hidden absolute left-5 top-0 bottom-0 w-1 bg-gradient-to-b from-emerald-300 via-amber-300 to-sky-300 rounded-full shadow-md" />
+                  <div className="relative py-8">
+                    {filteredData.map((item, index) => (
+                      <TimelineCard key={item.year} data={item} index={index} isLeft={index % 2 === 0} />
+                    ))}
+                  </div>
+                  <motion.div initial={{ opacity: 0, scale: 0 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ type: "spring", stiffness: 200, delay: 0.5 }} whileHover={{ scale: 1.5, rotate: 180 }} className="hidden md:flex absolute left-1/2 -translate-x-1/2 bottom-0 w-6 h-6 rounded-full bg-gradient-to-br from-slate-400 to-slate-600 shadow-lg ring-4 ring-white" />
+                </div>
+                <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mt-16 p-8 bg-white rounded-3xl shadow-sm border border-slate-100">
+                  <h2 className="text-xl font-semibold text-slate-800 mb-6 text-center">Evolution of Nobel Prize Focus</h2>
+                  <div className="grid md:grid-cols-3 gap-6">
+                    <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100/50 border border-emerald-100">
+                      <h3 className="font-semibold text-emerald-800 mb-2">2000-2007: Foundations</h3>
+                      <p className="text-sm text-emerald-700/80">Information economics, game theory, mechanism design, time series methods</p>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-gradient-to-br from-amber-50 to-amber-100/50 border border-amber-100">
+                      <h3 className="font-semibold text-amber-800 mb-2">2008-2015: Empirical Revolution</h3>
+                      <p className="text-sm text-amber-700/80">Market design applications, behavioral experiments, development RCTs</p>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-gradient-to-br from-sky-50 to-sky-100/50 border border-sky-100">
+                      <h3 className="font-semibold text-sky-800 mb-2">2016-2024: Grand Challenges</h3>
+                      <p className="text-sm text-sky-700/80">Climate economics, financial stability, inequality, gender gaps</p>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<Timeline />);
+    </script>
+</body>
+</html>
